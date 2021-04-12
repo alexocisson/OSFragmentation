@@ -9,8 +9,15 @@ namespace FragmentationVisualizer
 {
     class Block
     {
-        private int index;
+        public int index
+            { get; }
         private Color color;
+
+        public Block(Color col, int ind)
+        {
+            color = col;
+            index = ind;
+        }
 
         public void Draw(Canvas canvasToDraw, int pos)
         {
@@ -23,7 +30,7 @@ namespace FragmentationVisualizer
                 Height = size,
                 Width = size,
             };
-            rectangle.Fill = Brushes.Green;
+            rectangle.Fill = new SolidColorBrush(color);
             canvasToDraw.Children.Add(rectangle);
 
             int row = pos / columns;
