@@ -31,8 +31,8 @@ namespace FragmentationVisualizer
         public MainWindow()
         {
             InitializeComponent();
-            Memory = new Memory(100);
-            tempMemory = new Memory(10);
+            Memory = new Memory(300, MemoryCanevas);
+            tempMemory = new Memory(10, PreviewCanevas);
             rd = new Random();
             colorTempMemory = Color.FromRgb((byte)rd.Next(0,255), (byte)rd.Next(0, 255), (byte)rd.Next(0, 255));
         }
@@ -45,14 +45,24 @@ namespace FragmentationVisualizer
                 System.Diagnostics.Debug.WriteLine("NTFS");
 
                 Memory.indexToNTFS();
+                PlusButton.IsEnabled = false;
+                MinusButton.IsEnabled = false;
                 dispatcherTimer = new DispatcherTimer();
                 dispatcherTimer.Tick += new EventHandler(writeNTFS);
-                dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
+                dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 300);
                 dispatcherTimer.Start();
             }
             else
             {
                 System.Diagnostics.Debug.WriteLine("EXT4");
+
+                Memory.indexToEXT4(tempMemory.nbBlocks);
+                PlusButton.IsEnabled = false;
+                MinusButton.IsEnabled = false;
+                dispatcherTimer = new DispatcherTimer();
+                dispatcherTimer.Tick += new EventHandler(writeEXT4);
+                dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
+                dispatcherTimer.Start();
             }
             repaintCanevas();
         }
@@ -62,12 +72,33 @@ namespace FragmentationVisualizer
             if (tempMemory.index > 0)
             {
                 System.Diagnostics.Debug.WriteLine("in");
-                Memory.writeNTFS(tempMemory.pop());
+                Memory.writeNTFS(tempMemory.popTemp());
             }
             else
             {
                 System.Diagnostics.Debug.WriteLine("out");
                 dispatcherTimer.Stop();
+                PlusButton.IsEnabled = true;
+                MinusButton.IsEnabled = true;
+                if (tempMemory.index == 0)
+                    colorTempMemory = Color.FromRgb((byte)rd.Next(0, 255), (byte)rd.Next(0, 255), (byte)rd.Next(0, 255));
+            }
+            repaintCanevas();
+        }
+
+        public void writeEXT4(object sender, EventArgs e)
+        {
+            if (tempMemory.index > 0)
+            {
+                System.Diagnostics.Debug.WriteLine("in");
+                Memory.writeNTFS(tempMemory.popTemp());
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("out");
+                dispatcherTimer.Stop();
+                PlusButton.IsEnabled = true;
+                MinusButton.IsEnabled = true;
                 if (tempMemory.index == 0)
                     colorTempMemory = Color.FromRgb((byte)rd.Next(0, 255), (byte)rd.Next(0, 255), (byte)rd.Next(0, 255));
             }
@@ -89,6 +120,9 @@ namespace FragmentationVisualizer
             Canvas.SetTop(rectangle, 0);
             MemoryCanevas.Children.Add(rectangle);
 
+            Memory.addIndexRectangle(MemoryCanevas);
+            tempMemory.addIndexRectangle(PreviewCanevas);
+
             Memory.Draw(MemoryCanevas);
             tempMemory.Draw(PreviewCanevas);
         }
@@ -104,6 +138,12 @@ namespace FragmentationVisualizer
             tempMemory.pop();
             if(tempMemory.index == 0) 
                 colorTempMemory = Color.FromRgb((byte)rd.Next(0, 255), (byte)rd.Next(0, 255), (byte)rd.Next(0, 255));
+            repaintCanevas();
+        }
+
+        private void DefragButton_Click(object sender, RoutedEventArgs e)
+        {
+            Memory.fillRandom();
             repaintCanevas();
         }
     }

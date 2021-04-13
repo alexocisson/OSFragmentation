@@ -21,7 +21,7 @@
         <Button x:Name="MinusButton" Content="-" HorizontalAlignment="Left" Margin="103,37,0,0" VerticalAlignment="Top" Height="20" Width="20" Grid.Column="1" Click="MinusButton_Click"/>
         <Canvas x:Name="MemoryCanevas" Margin="10,62,10,70" Grid.ColumnSpan="2"/>
         <Canvas x:Name="PreviewCanevas" Margin="146,10,10,170" Grid.Column="1"/>
-        <Button x:Name="DefragButton" Content="Defragmenter" Margin="10,199,10,10" VerticalAlignment="Bottom" Grid.ColumnSpan="2" Height="20"/>
+        <Button x:Name="DefragButton" Content="Defragmenter" Margin="10,199,10,10" VerticalAlignment="Bottom" Grid.ColumnSpan="2" Height="20" Click="DefragButton_Click"/>
         <Button x:Name="WriteButton" Content="Ecrire" Margin="10,167,10,40" VerticalAlignment="Bottom" Grid.ColumnSpan="2" Height="20" RenderTransformOrigin="0.205,-2.098" Click="WriteButton_Click"/>
 
     </Grid>

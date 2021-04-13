@@ -33,11 +33,23 @@ namespace FragmentationVisualizer
             rectangle.Fill = new SolidColorBrush(color);
             canvasToDraw.Children.Add(rectangle);
 
+            TextBlock textBlock = new TextBlock();
+            textBlock.Text = ""+index;
+            textBlock.Foreground = new SolidColorBrush(Color.FromRgb((byte)(Math.Abs(255 -color.R)),
+                                                                     (byte)(Math.Abs(255 - color.G)),
+                                                                     (byte)(Math.Abs(255 - color.B))));
+            canvasToDraw.Children.Add(textBlock);
+
             int row = pos / columns;
             int column = pos - (row * columns);
 
             Canvas.SetLeft(rectangle, column * (size + margin));
             Canvas.SetTop(rectangle, row * (size + margin));
+
+            Canvas.SetLeft(textBlock, column * (size + margin));
+            Canvas.SetTop(textBlock, row * (size + margin));
         }
+
+
     }
 }
