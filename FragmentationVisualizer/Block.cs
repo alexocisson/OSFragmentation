@@ -11,7 +11,8 @@ namespace FragmentationVisualizer
     {
         public int index
             { get; }
-        private Color color;
+        public Color color
+        { get; }
 
         public Block(Color col, int ind)
         {

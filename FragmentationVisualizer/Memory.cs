@@ -4,6 +4,7 @@ using System.Text;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Linq;
 
 namespace FragmentationVisualizer
 {
@@ -170,6 +171,17 @@ namespace FragmentationVisualizer
                     }
                 }
             }
+        }
+
+        public HashSet<Color> getFiles()
+        {
+            HashSet<Color> files = new HashSet<Color>();
+            for (int i=0; i<N; i++)
+            {
+                if (blocks[i] != null)
+                    files.Add(blocks[i].color);
+            }
+            return files;
         }
 
         public void Draw(Canvas canvasToDraw)

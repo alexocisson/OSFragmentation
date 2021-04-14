@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 
+
 namespace FragmentationVisualizer
 {
     /// <summary>
@@ -61,7 +62,7 @@ namespace FragmentationVisualizer
                 MinusButton.IsEnabled = false;
                 dispatcherTimer = new DispatcherTimer();
                 dispatcherTimer.Tick += new EventHandler(writeEXT4);
-                dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
+                dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 300);
                 dispatcherTimer.Start();
             }
             repaintCanevas();
@@ -125,6 +126,7 @@ namespace FragmentationVisualizer
 
             Memory.Draw(MemoryCanevas);
             tempMemory.Draw(PreviewCanevas);
+            updateFileBox();
         }
 
         private void PlusButton_Click(object sender, RoutedEventArgs e)
@@ -145,6 +147,40 @@ namespace FragmentationVisualizer
         {
             Memory.fillRandom();
             repaintCanevas();
+        }
+
+        private void updateFileBox()
+        {
+            FileComboBox.Items.Clear();
+            Memory.getFiles().ToList().ForEach(x => {
+                ComboBoxItem it;
+                it = new ComboBoxItem();
+                it.Content = x;
+                it.Background = new SolidColorBrush(x);
+                FileComboBox.Items.Add(it);
+            }) ;
+            FileComboBox.SelectedIndex = 0;
+            
+            /*
+            FileComboBox.UpdateLayout();
+            for (int i = 0; i < FileComboBox.Items.Count; i++)
+            {
+                ComboBoxItem it = (ComboBoxItem)FileComboBox.ItemContainerGenerator.ContainerFromIndex(i);
+                if (it != null)
+                {
+                    it.Background = new SolidColorBrush((Color)it.Content);
+                }
+            }
+            */
+        }
+
+        private void FileComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            /*
+            if (FileComboBox.SelectedItem!= null)
+                FileComboBox.Background = new SolidColorBrush((Color)FileComboBox.SelectedItem);
+            FileComboBox.UpdateLayout();
+            */
         }
     }
 }
