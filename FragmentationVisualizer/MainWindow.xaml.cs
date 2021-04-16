@@ -32,7 +32,7 @@ namespace FragmentationVisualizer
         public MainWindow()
         {
             InitializeComponent();
-            Memory = new Memory(300, MemoryCanevas);
+            Memory = new Memory(216, MemoryCanevas);
             tempMemory = new Memory(10, PreviewCanevas);
             rd = new Random();
             colorTempMemory = Color.FromRgb((byte)rd.Next(0,255), (byte)rd.Next(0, 255), (byte)rd.Next(0, 255));
@@ -131,6 +131,8 @@ namespace FragmentationVisualizer
 
         private void PlusButton_Click(object sender, RoutedEventArgs e)
         {
+            if (tempMemory.index > 0)
+                tempMemory.getAtIndex(tempMemory.index - 1).hasNext = true;
             tempMemory.push(new Block(colorTempMemory, tempMemory.index));
             repaintCanevas();
         }
@@ -140,6 +142,18 @@ namespace FragmentationVisualizer
             tempMemory.pop();
             if(tempMemory.index == 0) 
                 colorTempMemory = Color.FromRgb((byte)rd.Next(0, 255), (byte)rd.Next(0, 255), (byte)rd.Next(0, 255));
+            repaintCanevas();
+        }
+
+        private void AddRandomButton_Click(object sender, RoutedEventArgs e)
+        {
+            Memory.fillRandom();
+            repaintCanevas();
+        }
+
+        private void Clean_Click(object sender, RoutedEventArgs e)
+        {
+            Memory.clear();
             repaintCanevas();
         }
 
@@ -177,10 +191,26 @@ namespace FragmentationVisualizer
         private void FileComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             /*
-            if (FileComboBox.SelectedItem!= null)
-                FileComboBox.Background = new SolidColorBrush((Color)FileComboBox.SelectedItem);
+            var item = (ComboBoxItem)(sender as ComboBox).SelectedItem;
+            //System.Diagnostics.Debug.WriteLine(item.Content);
+            if(item != null)
+                FileComboBox.Background = new SolidColorBrush((Color)(item.Content));
             FileComboBox.UpdateLayout();
             */
+        }
+
+        private void ReadButton_Click(object sender, RoutedEventArgs e)
+        {
+            Memory.startReading();
+            var item =FileComboBox.SelectedItem;
+
+            /*
+            PlusButton.IsEnabled = false;
+            MinusButton.IsEnabled = false;
+            dispatcherTimer = new DispatcherTimer();
+            dispatcherTimer.Tick += new EventHandler(writeNTFS);
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 300);
+            dispatcherTimer.Start();*/
         }
     }
 }

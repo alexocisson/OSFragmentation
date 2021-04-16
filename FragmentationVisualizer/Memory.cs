@@ -71,9 +71,9 @@ namespace FragmentationVisualizer
                 index--;
                 nbBlocks--;
                 Block block = blocks[0];
-                blocks[index] = null;
                 for (int i = 0; i < index; i++)
                     blocks[i] = blocks[i + 1];
+                blocks[index] = null;
                 return block;
             }
             return new Block(new Color(), -1);
@@ -90,6 +90,11 @@ namespace FragmentationVisualizer
                 return block;
             }
             return new Block(new Color(), -1);
+        }
+
+        public Block getAtIndex(int i)
+        {
+            return blocks[i];
         }
 
         public void writeNTFS(Block block)
@@ -196,6 +201,13 @@ namespace FragmentationVisualizer
 
         }
 
+        internal void clear()
+        {
+            blocks = new Block[N];
+            index = 0;
+            nbBlocks = 0;
+        }
+
         public void DrawIndex(Canvas canvasToDraw, int pos)
         {
             int size = 20;
@@ -207,6 +219,11 @@ namespace FragmentationVisualizer
 
             Canvas.SetLeft(indexRectangle, column * (size + margin));
             Canvas.SetTop(indexRectangle, row * (size + margin));
+        }
+
+        public void startReading()
+        {
+            index = 0;
         }
     }
 }

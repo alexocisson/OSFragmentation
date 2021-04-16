@@ -14,6 +14,8 @@ namespace FragmentationVisualizer
         public Color color
         { get; }
 
+        public Boolean hasNext = false;
+
         public Block(Color col, int ind)
         {
             color = col;

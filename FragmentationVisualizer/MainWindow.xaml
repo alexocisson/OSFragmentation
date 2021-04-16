@@ -6,27 +6,29 @@
                 
         xmlns:local="clr-namespace:FragmentationVisualizer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="415" Width="642">
+        Title="MainWindow" Height="404" Width="642" ResizeMode="NoResize">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0*"/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="37*"/>
+            <ColumnDefinition Width="177*"/>
         </Grid.ColumnDefinitions>
-        <ComboBox x:Name="FormatComboBox" SelectedIndex="0" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="131" Grid.ColumnSpan="2" Height="22">
+        <ComboBox x:Name="FormatComboBox" SelectedIndex="0" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="131" Grid.ColumnSpan="3" Height="22">
             <ComboBoxItem Content="NTFS"/>
             <ComboBoxItem Content="EXT4"/>
         </ComboBox>
-        <TextBlock HorizontalAlignment="Left" Margin="10,37,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="16" Width="81"><Run Language="fr-ch" Text="Taille du fichier:"/></TextBlock>
-        <Button x:Name="PlusButton" Content="+" HorizontalAlignment="Left" Margin="78,37,0,0" VerticalAlignment="Top" Height="20" Width="20" Grid.Column="1" Click="PlusButton_Click"/>
-        <Button x:Name="MinusButton" Content="-" HorizontalAlignment="Left" Margin="103,37,0,0" VerticalAlignment="Top" Height="20" Width="20" Grid.Column="1" Click="MinusButton_Click"/>
-        <Canvas x:Name="MemoryCanevas" Margin="10,62,10,139" Grid.ColumnSpan="2"/>
-        <Canvas x:Name="PreviewCanevas" Margin="146,10,10,342" Grid.Column="1"/>
-        <Button x:Name="DefragButton" Content="Defragmenter" Margin="10,199,10,10" VerticalAlignment="Bottom" Grid.ColumnSpan="2" Height="20" Click="DefragButton_Click"/>
-        <Button x:Name="WriteButton" Content="Ecrire" Margin="10,167,10,60" VerticalAlignment="Bottom" Grid.ColumnSpan="2" Height="20" RenderTransformOrigin="0.205,-2.098" Click="WriteButton_Click"/>
-        <ComboBox x:Name="FileComboBox" SelectedIndex="0" HorizontalAlignment="Left" Margin="10,167,300,35" VerticalAlignment="Bottom" Width="131" Grid.ColumnSpan="2" Height="22" SelectionChanged="FileComboBox_SelectionChanged">
-            
-        </ComboBox>
-        <Button x:Name="ReadButton" Content="Lire" Margin="300,167,10,35" VerticalAlignment="Bottom" Grid.ColumnSpan="2" Height="20" RenderTransformOrigin="0.205,-2.098" HorizontalAlignment="Right" Width="200"/>
+        <TextBlock HorizontalAlignment="Left" Margin="10,37,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="16" Width="85"><Run Language="fr-ch" Text="Taille du fichier:"/></TextBlock>
+        <Button x:Name="PlusButton" Content="+" HorizontalAlignment="Left" Margin="95,37,0,0" VerticalAlignment="Top" Height="20" Width="20" Grid.Column="1" Click="PlusButton_Click" Grid.ColumnSpan="2"/>
+        <Button x:Name="MinusButton" Content="-" HorizontalAlignment="Left" Margin="9,37,0,0" VerticalAlignment="Top" Height="20" Width="20" Grid.Column="2" Click="MinusButton_Click"/>
+        <Canvas x:Name="MemoryCanevas" Margin="10,62,10,76" Grid.ColumnSpan="3"/>
+        <Canvas x:Name="PreviewCanevas" Margin="35,38,10,311" Grid.Column="2" VerticalAlignment="Top" Height="25"/>
+        <Button x:Name="DefragButton" Content="Defragmenter" Margin="215,317,10,0" VerticalAlignment="Top" Height="20" Click="DefragButton_Click" Grid.Column="2"/>
+        <Button x:Name="WriteButton" Content="Ecrire" Margin="35,13,321,0" VerticalAlignment="Top" Height="20" RenderTransformOrigin="0.205,-2.098" Click="WriteButton_Click" Grid.Column="2"/>
+        <ComboBox x:Name="FileComboBox" SelectedIndex="0" Margin="10,341,321,0" VerticalAlignment="Top" Grid.ColumnSpan="3" Height="22" SelectionChanged="FileComboBox_SelectionChanged"/>
+        <Button x:Name="ReadButton" Content="Lire" Margin="215,341,10,0" VerticalAlignment="Top" Height="20" RenderTransformOrigin="0.205,-2.098" Grid.Column="2" Click="ReadButton_Click"/>
+        <Button x:Name="AddRandomButton" Content="Add Random Files" HorizontalAlignment="Left" Margin="10,317,0,0" VerticalAlignment="Top" Height="20" Width="311" Grid.Column="1" Click="AddRandomButton_Click" Grid.ColumnSpan="2"/>
+        <Button x:Name="ResetButton" Content="Nettoyer" Margin="215,13,10,0" VerticalAlignment="Top" Height="20" RenderTransformOrigin="0.205,-2.098" Click="Clean_Click" Grid.Column="2"/>
+        <Border BorderThickness="1" BorderBrush="Black" Grid.ColumnSpan="3" HorizontalAlignment="Left" Height="250" Margin="10,62,0,0" VerticalAlignment="Top" Width="622"/>
 
     </Grid>
 </Window>
