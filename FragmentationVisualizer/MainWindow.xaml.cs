@@ -25,6 +25,7 @@ namespace FragmentationVisualizer
         private Memory Memory;
         private Memory tempMemory;
         private Random rd;
+        private int indexReading;
 
         private DispatcherTimer dispatcherTimer;
         private Color colorTempMemory;
@@ -46,8 +47,7 @@ namespace FragmentationVisualizer
                 System.Diagnostics.Debug.WriteLine("NTFS");
 
                 Memory.indexToNTFS();
-                PlusButton.IsEnabled = false;
-                MinusButton.IsEnabled = false;
+                disableButtons();
                 dispatcherTimer = new DispatcherTimer();
                 dispatcherTimer.Tick += new EventHandler(writeNTFS);
                 dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 300);
@@ -58,8 +58,7 @@ namespace FragmentationVisualizer
                 System.Diagnostics.Debug.WriteLine("EXT4");
 
                 Memory.indexToEXT4(tempMemory.nbBlocks);
-                PlusButton.IsEnabled = false;
-                MinusButton.IsEnabled = false;
+                disableButtons();
                 dispatcherTimer = new DispatcherTimer();
                 dispatcherTimer.Tick += new EventHandler(writeEXT4);
                 dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 300);
@@ -70,19 +69,22 @@ namespace FragmentationVisualizer
 
         public void writeNTFS(object sender, EventArgs e)
         {
-            if (tempMemory.index > 0)
+            if (tempMemory.index > 1)
             {
-                System.Diagnostics.Debug.WriteLine("in");
+                Memory.writeNTFS(tempMemory.popTemp());
+            }
+            else if(tempMemory.index==1)
+            {
+                tempMemory.getAtIndex(0).isLast = true;
                 Memory.writeNTFS(tempMemory.popTemp());
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine("out");
                 dispatcherTimer.Stop();
-                PlusButton.IsEnabled = true;
-                MinusButton.IsEnabled = true;
                 if (tempMemory.index == 0)
                     colorTempMemory = Color.FromRgb((byte)rd.Next(0, 255), (byte)rd.Next(0, 255), (byte)rd.Next(0, 255));
+                enableButtons();
+                updateFileBox();
             }
             repaintCanevas();
         }
@@ -98,10 +100,10 @@ namespace FragmentationVisualizer
             {
                 System.Diagnostics.Debug.WriteLine("out");
                 dispatcherTimer.Stop();
-                PlusButton.IsEnabled = true;
-                MinusButton.IsEnabled = true;
                 if (tempMemory.index == 0)
                     colorTempMemory = Color.FromRgb((byte)rd.Next(0, 255), (byte)rd.Next(0, 255), (byte)rd.Next(0, 255));
+                enableButtons();
+                updateFileBox();
             }
             repaintCanevas();
         }
@@ -116,23 +118,19 @@ namespace FragmentationVisualizer
                 Height = MemoryCanevas.ActualHeight,
                 Width = MemoryCanevas.ActualWidth,
             };
-            rectangle.Fill = Brushes.Blue;
+            rectangle.Fill = Brushes.White;
             Canvas.SetLeft(rectangle, 0);
             Canvas.SetTop(rectangle, 0);
             MemoryCanevas.Children.Add(rectangle);
 
+            Memory.Draw(MemoryCanevas);
+            tempMemory.Draw(PreviewCanevas); 
             Memory.addIndexRectangle(MemoryCanevas);
             tempMemory.addIndexRectangle(PreviewCanevas);
-
-            Memory.Draw(MemoryCanevas);
-            tempMemory.Draw(PreviewCanevas);
-            updateFileBox();
         }
 
         private void PlusButton_Click(object sender, RoutedEventArgs e)
         {
-            if (tempMemory.index > 0)
-                tempMemory.getAtIndex(tempMemory.index - 1).hasNext = true;
             tempMemory.push(new Block(colorTempMemory, tempMemory.index));
             repaintCanevas();
         }
@@ -149,12 +147,14 @@ namespace FragmentationVisualizer
         {
             Memory.fillRandom();
             repaintCanevas();
+            updateFileBox();
         }
 
         private void Clean_Click(object sender, RoutedEventArgs e)
         {
             Memory.clear();
             repaintCanevas();
+            updateFileBox();
         }
 
         private void DefragButton_Click(object sender, RoutedEventArgs e)
@@ -174,18 +174,6 @@ namespace FragmentationVisualizer
                 FileComboBox.Items.Add(it);
             }) ;
             FileComboBox.SelectedIndex = 0;
-            
-            /*
-            FileComboBox.UpdateLayout();
-            for (int i = 0; i < FileComboBox.Items.Count; i++)
-            {
-                ComboBoxItem it = (ComboBoxItem)FileComboBox.ItemContainerGenerator.ContainerFromIndex(i);
-                if (it != null)
-                {
-                    it.Background = new SolidColorBrush((Color)it.Content);
-                }
-            }
-            */
         }
 
         private void FileComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -202,15 +190,87 @@ namespace FragmentationVisualizer
         private void ReadButton_Click(object sender, RoutedEventArgs e)
         {
             Memory.startReading();
-            var item =FileComboBox.SelectedItem;
+            indexReading = 0;
+            var item = (ComboBoxItem)FileComboBox.SelectedItem;
+            if (item != null)
+            {
+                disableButtons();
+                tempMemory.clear();
+                dispatcherTimer = new DispatcherTimer();
+                dispatcherTimer.Tick += new EventHandler(readFile);
+                dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 300);
+                dispatcherTimer.Start();
+            }
+            else
+            {
 
+            }
             /*
-            PlusButton.IsEnabled = false;
-            MinusButton.IsEnabled = false;
+            disableButtons()
             dispatcherTimer = new DispatcherTimer();
             dispatcherTimer.Tick += new EventHandler(writeNTFS);
             dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 300);
             dispatcherTimer.Start();*/
+        }
+        public void readFile(object sender, EventArgs e)
+        {
+            var item = (ComboBoxItem)FileComboBox.SelectedItem;
+            if (Memory.getAtIndex(Memory.index) != null)
+            {
+                System.Diagnostics.Debug.WriteLine((Color)item.Content);
+                System.Diagnostics.Debug.WriteLine(Memory.getAtIndex(Memory.index).color);
+                if (Memory.getAtIndex(Memory.index).color == (Color)item.Content && Memory.getAtIndex(Memory.index).index == indexReading)
+                {
+                    indexReading++;
+                    dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 300);
+                    if (Memory.getAtIndex(Memory.index).isLast)
+                    {
+                        dispatcherTimer.Stop();
+                        updateFileBox();
+                        enableButtons();
+                    }
+                    Memory.removeAt(Memory.index);
+                }
+                else
+                {
+                    dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 150);
+                }
+                
+            }
+            else
+            {
+                dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 75);
+            }
+            Memory.index++;
+            if (Memory.index >= Memory.N)
+                Memory.index = 0;
+            repaintCanevas();
+        }
+
+
+        public void disableButtons()
+        {
+            PlusButton.IsEnabled = false;
+            MinusButton.IsEnabled = false;
+            DefragButton.IsEnabled = false;
+            WriteButton.IsEnabled = false;
+            ReadButton.IsEnabled = false;
+            AddRandomButton.IsEnabled = false;
+            ResetButton.IsEnabled = false;
+            FormatComboBox.IsEnabled = false;
+            FileComboBox.IsEnabled = false;
+        }
+
+        public void enableButtons()
+        {
+            PlusButton.IsEnabled = true;
+            MinusButton.IsEnabled = true;
+            DefragButton.IsEnabled = true;
+            WriteButton.IsEnabled = true;
+            ReadButton.IsEnabled = true;
+            AddRandomButton.IsEnabled = true;
+            ResetButton.IsEnabled = true;
+            FileComboBox.IsEnabled = true;
         }
     }
 }

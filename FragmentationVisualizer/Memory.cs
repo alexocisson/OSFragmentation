@@ -10,7 +10,10 @@ namespace FragmentationVisualizer
 {
     class Memory
     {
-        private int N;
+        public int N
+        {
+            get;
+        }
         public int nbBlocks
             { get; set; }
         private Block[] blocks;
@@ -30,7 +33,7 @@ namespace FragmentationVisualizer
             {
                 Height = 20,
                 Width = 20,
-                StrokeThickness = 1,
+                StrokeThickness = 2,
                 Stroke = Brushes.Red,
             };
             canvasToDraw.Children.Add(indexRectangle);
@@ -94,6 +97,10 @@ namespace FragmentationVisualizer
 
         public Block getAtIndex(int i)
         {
+            if (i >= N)
+                i = 0;
+            if (index >= N)
+                index = 0;
             return blocks[i];
         }
 
@@ -126,12 +133,10 @@ namespace FragmentationVisualizer
                 int tmpIndex = index;
                 for (int i = 0; i<size; i++)
                 {
-                    System.Diagnostics.Debug.WriteLine("Testing block at" + tmpIndex);
                     if (blocks[tmpIndex] != null)
                     {
                         answere = false;
                         index = tmpIndex;
-                        System.Diagnostics.Debug.WriteLine("It's taken yo!");
                     }
                     tmpIndex++;
                 }
@@ -150,7 +155,6 @@ namespace FragmentationVisualizer
                 index = 0;
             while (blocks[index]!=null&&cnt<(N-nbBlocks))
             {
-                System.Diagnostics.Debug.WriteLine("Looking at index: " + index);
                 index++;
                 cnt++;
                 if (index == N)
@@ -174,6 +178,7 @@ namespace FragmentationVisualizer
                         blocks[index] = new Block(color, j);
                         index++;
                     }
+                    blocks[index - 1].isLast = true;
                 }
             }
         }
@@ -191,13 +196,13 @@ namespace FragmentationVisualizer
 
         public void Draw(Canvas canvasToDraw)
         {
+            DrawIndex(canvasToDraw, index);
             for (int i = 0; i< N; i++)
             {
                 if (blocks[i]!=null)
                     blocks[i].Draw(canvasToDraw, i);
             }
 
-            DrawIndex(canvasToDraw, index);
 
         }
 
@@ -206,6 +211,12 @@ namespace FragmentationVisualizer
             blocks = new Block[N];
             index = 0;
             nbBlocks = 0;
+        }
+
+        public void removeAt(int i)
+        {
+            if(i<N)
+                blocks[i]=null;
         }
 
         public void DrawIndex(Canvas canvasToDraw, int pos)

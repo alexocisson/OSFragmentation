@@ -14,7 +14,7 @@ namespace FragmentationVisualizer
         public Color color
         { get; }
 
-        public Boolean hasNext = false;
+        public Boolean isLast = false;
 
         public Block(Color col, int ind)
         {
@@ -34,6 +34,12 @@ namespace FragmentationVisualizer
                 Width = size,
             };
             rectangle.Fill = new SolidColorBrush(color);
+            /*
+            if (isLast)
+            {
+                rectangle.StrokeThickness = 5;
+                rectangle.Stroke = Brushes.Black;
+            }*/
             canvasToDraw.Children.Add(rectangle);
 
             TextBlock textBlock = new TextBlock();
