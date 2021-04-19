@@ -99,12 +99,10 @@ namespace FragmentationVisualizer
         {
             if (tempMemory.index > 0)
             {
-                System.Diagnostics.Debug.WriteLine("in");
                 Memory.writeNTFS(tempMemory.popTemp());
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine("out");
                 dispatcherTimer.Stop();
                 if (tempMemory.index == 0)
                     colorTempMemory = Color.FromRgb((byte)rd.Next(0, 255), (byte)rd.Next(0, 255), (byte)rd.Next(0, 255));
@@ -188,36 +186,83 @@ namespace FragmentationVisualizer
         }
         public void defrag(object sender, EventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("Im in yo <3");
-            switch (defragState)
+            if (indexDefragLecture > Memory.N - 1)
             {
-                case 0:
-                    indexFileDefrag = 0;
-                    if (Memory.getAtIndex(indexDefragLecture) != null)
-                    {
-                        if (Memory.getAtIndex(indexDefragLecture).index == indexFileDefrag)
+                dispatcherTimer.Stop();
+                tempMemory.clear();
+                tempMemory = new Memory(10, PreviewCanevas);
+                Memory.index = 0;
+                enableButtons();
+            }
+            else
+            {
+                switch (defragState)
+                {
+                    case 0:
+                        indexFileDefrag = 0;
+                        if (Memory.getAtIndex(indexDefragLecture) != null)
                         {
-                            defragState = 1;
-                            colorFileDefrag = Memory.getAtIndex(indexDefragLecture).color;
-                            Memory.setAtIndex(indexDefragEcriture, Memory.getAtIndex(indexDefragLecture));
-                            Memory.removeAt(indexDefragLecture);
-                            indexDefragEcriture++;
-                            indexFileDefrag++;
+                            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 250);
+                            if (Memory.getAtIndex(indexDefragLecture).index == indexFileDefrag)
+                            {
+                                defragState = 1;
+                                colorFileDefrag = Memory.getAtIndex(indexDefragLecture).color;
+                                Memory.setAtIndex(indexDefragEcriture, Memory.getAtIndex(indexDefragLecture));
+                                Memory.removeAt(indexDefragLecture);
+                                indexDefragEcriture++;
+                                indexFileDefrag++;
+                            }
+                            else
+                            {
+                                tempMemory.pushDefrag(Memory.getAtIndex(indexDefragLecture));
+                                Memory.removeAt(indexDefragLecture);
+                            }
                         }
                         else
                         {
+                            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 70);
+                        }
+                        indexDefragLecture++;
+                        break;
+                    case 1:
+                        if (Memory.getAtIndex(indexDefragLecture) != null)
+                        {
+                            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 250);
                             tempMemory.pushDefrag(Memory.getAtIndex(indexDefragLecture));
                             Memory.removeAt(indexDefragLecture);
+                            if (tempMemory.getColorBlock(colorFileDefrag, indexFileDefrag) != -1)
+                            {
+                                int i = tempMemory.getColorBlock(colorFileDefrag, indexFileDefrag);
+                                Block c = tempMemory.getAtIndex(i);
+                                tempMemory.removeAtTemp(i);
+                                Memory.setAtIndex(indexDefragEcriture, c);
+                                indexDefragEcriture++;
+                                indexFileDefrag++;
+                                if (c.isLast)
+                                    defragState = 2;
+                            }
                         }
-                    }
-                    indexDefragLecture++;
-                    break;
-                case 1:
-                    if (Memory.getAtIndex(indexDefragLecture) != null)
-                    {
-                        tempMemory.pushDefrag(Memory.getAtIndex(indexDefragLecture));
-                        Memory.removeAt(indexDefragLecture);
-                        if(tempMemory.getColorBlock(colorFileDefrag, indexFileDefrag)!=-1)
+                        else
+                        {
+                            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 70);
+                        }
+                        indexDefragLecture++;
+                        break;
+                    case 2:
+                        if (tempMemory.getANumberOne() != -1)
+                        {
+                            colorFileDefrag = tempMemory.getAtIndex(tempMemory.getANumberOne()).color;
+                            indexFileDefrag = 0;
+                            defragState = 3;
+                        }
+                        else
+                        {
+                            defragState = 0;
+                        }
+                        break;
+
+                    case 3:
+                        if (tempMemory.getColorBlock(colorFileDefrag, indexFileDefrag) != -1)
                         {
                             int i = tempMemory.getColorBlock(colorFileDefrag, indexFileDefrag);
                             Block c = tempMemory.getAtIndex(i);
@@ -228,45 +273,17 @@ namespace FragmentationVisualizer
                             if (c.isLast)
                                 defragState = 2;
                         }
-                    }
-                    indexDefragLecture++;
-                    break;
-                case 2:
-                    if(tempMemory.getANumberOne()!=-1)
-                    {
-                        colorFileDefrag = tempMemory.getAtIndex(tempMemory.getANumberOne()).color;
-                        indexFileDefrag = 0;
-                        defragState = 3;
-                    }
-                    else
-                    {
-                        defragState = 0;
-                    }
-                    break;
-
-                case 3:
-                    if(tempMemory.getColorBlock(colorFileDefrag, indexFileDefrag)!=-1)
-                    {
-                        int i = tempMemory.getColorBlock(colorFileDefrag, indexFileDefrag);
-                        Block c = tempMemory.getAtIndex(i);
-                        tempMemory.removeAtTemp(i);
-                        Memory.setAtIndex(indexDefragEcriture, c);
-                        indexDefragEcriture++;
-                        indexFileDefrag++;
-                        if (c.isLast)
-                            defragState = 2;
-                    }
-                    else
-                    {
-                        defragState = 1;
-                    }
-                    break;
-                default:
-                    break;
+                        else
+                        {
+                            defragState = 1;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                Memory.index = indexDefragLecture;
             }
-            Memory.index = indexDefragLecture;
             repaintCanevas();
-
         }
 
             private void updateFileBox()
@@ -376,6 +393,7 @@ namespace FragmentationVisualizer
             ReadButton.IsEnabled = true;
             AddRandomButton.IsEnabled = true;
             ResetButton.IsEnabled = true;
+            FormatComboBox.IsEnabled = true;
             FileComboBox.IsEnabled = true;
         }
     }
