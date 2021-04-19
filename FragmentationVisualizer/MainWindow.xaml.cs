@@ -26,6 +26,12 @@ namespace FragmentationVisualizer
         private Memory tempMemory;
         private Random rd;
         private int indexReading;
+        private int indexDefragLecture;
+        private int indexDefragEcriture;
+        private int indexFileDefrag;
+        private Color colorFileDefrag;
+        private int defragState;
+
 
         private DispatcherTimer dispatcherTimer;
         private Color colorTempMemory;
@@ -159,21 +165,121 @@ namespace FragmentationVisualizer
 
         private void DefragButton_Click(object sender, RoutedEventArgs e)
         {
-            Memory.fillRandom();
+            indexDefragLecture = 0;
+            indexDefragEcriture = 0;
+            indexFileDefrag = 1;
+            defragState = 0;
+            tempMemory.clear();
+            tempMemory = new Memory(100, PreviewCanevas);
+            if (Memory.nbBlocks>0)
+            {
+                disableButtons();
+                tempMemory.clear();
+                dispatcherTimer = new DispatcherTimer();
+                dispatcherTimer.Tick += new EventHandler(defrag);
+                dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 100);
+                dispatcherTimer.Start();
+            }
+            else
+            {
+
+            }
             repaintCanevas();
         }
-
-        private void updateFileBox()
+        public void defrag(object sender, EventArgs e)
         {
-            FileComboBox.Items.Clear();
-            Memory.getFiles().ToList().ForEach(x => {
-                ComboBoxItem it;
-                it = new ComboBoxItem();
-                it.Content = x;
-                it.Background = new SolidColorBrush(x);
-                FileComboBox.Items.Add(it);
-            }) ;
-            FileComboBox.SelectedIndex = 0;
+            System.Diagnostics.Debug.WriteLine("Im in yo <3");
+            switch (defragState)
+            {
+                case 0:
+                    indexFileDefrag = 0;
+                    if (Memory.getAtIndex(indexDefragLecture) != null)
+                    {
+                        if (Memory.getAtIndex(indexDefragLecture).index == indexFileDefrag)
+                        {
+                            defragState = 1;
+                            colorFileDefrag = Memory.getAtIndex(indexDefragLecture).color;
+                            Memory.setAtIndex(indexDefragEcriture, Memory.getAtIndex(indexDefragLecture));
+                            Memory.removeAt(indexDefragLecture);
+                            indexDefragEcriture++;
+                            indexFileDefrag++;
+                        }
+                        else
+                        {
+                            tempMemory.pushDefrag(Memory.getAtIndex(indexDefragLecture));
+                            Memory.removeAt(indexDefragLecture);
+                        }
+                    }
+                    indexDefragLecture++;
+                    break;
+                case 1:
+                    if (Memory.getAtIndex(indexDefragLecture) != null)
+                    {
+                        tempMemory.pushDefrag(Memory.getAtIndex(indexDefragLecture));
+                        Memory.removeAt(indexDefragLecture);
+                        if(tempMemory.getColorBlock(colorFileDefrag, indexFileDefrag)!=-1)
+                        {
+                            int i = tempMemory.getColorBlock(colorFileDefrag, indexFileDefrag);
+                            Block c = tempMemory.getAtIndex(i);
+                            tempMemory.removeAtTemp(i);
+                            Memory.setAtIndex(indexDefragEcriture, c);
+                            indexDefragEcriture++;
+                            indexFileDefrag++;
+                            if (c.isLast)
+                                defragState = 2;
+                        }
+                    }
+                    indexDefragLecture++;
+                    break;
+                case 2:
+                    if(tempMemory.getANumberOne()!=-1)
+                    {
+                        colorFileDefrag = tempMemory.getAtIndex(tempMemory.getANumberOne()).color;
+                        indexFileDefrag = 0;
+                        defragState = 3;
+                    }
+                    else
+                    {
+                        defragState = 0;
+                    }
+                    break;
+
+                case 3:
+                    if(tempMemory.getColorBlock(colorFileDefrag, indexFileDefrag)!=-1)
+                    {
+                        int i = tempMemory.getColorBlock(colorFileDefrag, indexFileDefrag);
+                        Block c = tempMemory.getAtIndex(i);
+                        tempMemory.removeAtTemp(i);
+                        Memory.setAtIndex(indexDefragEcriture, c);
+                        indexDefragEcriture++;
+                        indexFileDefrag++;
+                        if (c.isLast)
+                            defragState = 2;
+                    }
+                    else
+                    {
+                        defragState = 1;
+                    }
+                    break;
+                default:
+                    break;
+            }
+            Memory.index = indexDefragLecture;
+            repaintCanevas();
+
+        }
+
+            private void updateFileBox()
+        {
+        FileComboBox.Items.Clear();
+        Memory.getFiles().ToList().ForEach(x => {
+            ComboBoxItem it;
+            it = new ComboBoxItem();
+            it.Content = x;
+            it.Background = new SolidColorBrush(x);
+            FileComboBox.Items.Add(it);
+        }) ;
+        FileComboBox.SelectedIndex = 0;
         }
 
         private void FileComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)

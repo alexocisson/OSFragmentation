@@ -53,6 +53,13 @@ namespace FragmentationVisualizer
                 nbBlocks++;
             }
         }
+
+        public void pushDefrag(Block block)
+        {
+            push(block);
+            //blocks.OrderBy(o => o.index);
+        }
+
         public void pushTemp(Block block)
         {
             if (index < N)
@@ -177,6 +184,7 @@ namespace FragmentationVisualizer
                         findNextFree();
                         blocks[index] = new Block(color, j);
                         index++;
+                        nbBlocks++;
                     }
                     blocks[index - 1].isLast = true;
                 }
@@ -218,6 +226,43 @@ namespace FragmentationVisualizer
             if(i<N)
                 blocks[i]=null;
         }
+
+        public void removeAtTemp(int i)
+        {
+            if (i < N - 1)
+                blocks[i] = null;
+            for (int j = i; j < N - 1; j++)
+                blocks[j] = blocks[j + 1];
+            blocks[N - 1] = null;
+            index--;
+        }
+
+        public int getColorBlock(Color c, int index)
+        {
+            for (int i= 0; i < N; i++)
+            {
+                if (blocks[i]!=null && blocks[i].color == c && blocks[i].index == index)
+                    return i;
+            }
+            return -1;
+        }
+
+        public int getANumberOne()
+        {
+            for (int i = 0; i < N; i++)
+            {
+                if (blocks[i] != null && blocks[i].index == 1)
+                    return i;
+            }
+            return -1;
+        }
+
+        public void setAtIndex(int i, Block c)
+        {
+            blocks[i] = c;
+        }
+
+
 
         public void DrawIndex(Canvas canvasToDraw, int pos)
         {
